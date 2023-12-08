@@ -23,6 +23,17 @@ function test1()
     println("Autograd: ", g)
     @test abs(gnu-g.z) < 1e-4
 
+    #=
+    z = ComplexField(2+3im)
+    fz(z) = z^4+2*z*z' + z
+    println(f(z))
+    gnu = numerical_Wiltingerderivative(fz,z)
+    println("Numerical grad: ", gnu)
+
+    g = gradient(fz,z)[1]
+    println("Autograd: ", g)
+
+    =#
 end
 
 @testset "Wiltingerderivative.jl" begin

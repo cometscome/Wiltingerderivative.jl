@@ -2,13 +2,9 @@ using Zygote
 using ChainRulesCore
 using LinearAlgebra
 
-
-
 struct ComplexField{T} 
     z::T
 end
-
-
 
 function Base.adjoint(a::ComplexField{T}) where T
     return  ComplexField{T}(a.z')
@@ -22,8 +18,29 @@ function Base.:*(a::T,b::ComplexField) where T<:Number
     return ComplexField(a*b.z)
 end
 
+function Base.:*(b::ComplexField,a::T) where T<:Number
+    return ComplexField(a*b.z)
+end
+
+
+function Base.:/(a::ComplexField,b::ComplexField) 
+    return ComplexField(a.z/b.z)
+end
+
+function Base.:/(a::ComplexField,b::T)  where T<:Number
+    return ComplexField(a.z/b)
+end
+
+function Base.:/(a::T,b::ComplexField)  where T<:Number
+    return ComplexField(a/b.z)
+end
+
 function Base.:+(a::ComplexField,b::ComplexField) 
     return ComplexField(a.z+b.z)
+end
+
+function Base.:-(a::ComplexField,b::ComplexField) 
+    return ComplexField(a.z-b.z)
 end
 
 
@@ -31,11 +48,13 @@ function Base.:*(b::ComplexField,a::T) where T<:Number
     return ComplexField(a*b.z)
 end
 
+function Base.:^(a::ComplexField,n::Integer) 
+    return ComplexField(a.z^n)
+end
+
 function Base.display(a::ComplexField)
     display(a.z)
 end
-
-
 
 function LinearAlgebra.tr(A::ComplexField)
     return ComplexField(tr(A.z))
@@ -101,6 +120,17 @@ function ChainRulesCore.rrule(::typeof(+),a::T1,b::T1)  where T1 <: ComplexField
         sbar = NoTangent()
         fabar = ybar#*b
         fbbar = ybar
+        return sbar,fabar,fbbar
+    end
+    return y, pullback
+end
+
+function ChainRulesCore.rrule(::typeof(-),a::T1,b::T1)  where T1 <: ComplexField
+    y = a - b
+    function pullback(ybar)
+        sbar = NoTangent()
+        fabar = ybar#*b
+        fbbar = -1*ybar
         return sbar,fabar,fbbar
     end
     return y, pullback
