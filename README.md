@@ -51,13 +51,24 @@ f(z) = z^4 + 2 z \bar{z} + z
 # Code examples
 ```julia
 
-z = ComplexField(2+3im)
-f(z) = z^4+2*z*z' + z
-println(f(z))
-gnu = numerical_Wiltingerderivative(f,z)
+a = ComplexField(2+3im)
+b = ComplexField(4+im)
+c = ComplexField(1+2im)
+println(a*b)
+println(a*b')
+f(x) = real(x)
+gnu = numerical_Wiltingerderivative(f,a)
 println("Numerical grad: ", gnu)
 
-g = gradient(f,z)[1]
+g = gradient(f,a)[1]
 println("Autograd: ", g)
+@test abs(gnu-g.z) < 1e-4
+
+f2(x) = real(x*x'+x+x'+x*x*x')
+gnu = numerical_Wiltingerderivative(f2,a)
+println("Numerical grad: ", gnu)
+g = gradient(f2,a)[1]
+println("Autograd: ", g)
+@test abs(gnu-g.z) < 1e-4
 ```
 
